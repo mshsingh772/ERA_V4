@@ -1,0 +1,79 @@
+<!-- session2/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processor</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #333; }
+        form { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
+        form div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input[type="file"] { border: 1px solid #ccc; padding: 8px; border-radius: 4px; width: calc(100% - 18px); background-color: #fff; }
+        select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .image-display { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+        .image-box { text-align: center; border: 1px solid #eee; padding: 15px; border-radius: 8px; background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .image-box img { max-width: 400px; height: auto; display: block; margin: 0 auto; border: 1px solid #ddd; border-radius: 4px; }
+        .message { color: red; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        .actions { display: flex; gap: 10px; }
+        .actions button { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Processor</h1>
+
+        {% if message %}
+            <p class="message">{{ message }}</p>
+        {% endif %}
+
+        {% if not original_image %}
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <div>
+                    <label for="file">Upload Image:</label>
+                    <input type="file" name="file" id="file" accept="image/*" required>
+                </div>
+                <button type="submit">Upload & Process</button>
+            </form>
+        {% else %}
+            <form action="/" method="get">
+                <div>
+                    <label for="filter">Select Filter:</label>
+                    <select name="filter" id="filter" onchange="this.form.submit()">
+                        <option value="none" {% if selected_filter == 'none' %}selected{% endif %}>No Filter</option>
+                        <option value="grayscale" {% if selected_filter == 'grayscale' %}selected{% endif %}>Grayscale</option>
+                        <option value="gaussian" {% if selected_filter == 'gaussian' %}selected{% endif %}>Gaussian Blur</option>
+                        <option value="edges" {% if selected_filter == 'edges' %}selected{% endif %}>Find Edges (Overall)</option>
+                        <option value="horizontal_edges" {% if selected_filter == 'horizontal_edges' %}selected{% endif %}>Horizontal Edges</option>
+                        <option value="vertical_edges" {% if selected_filter == 'vertical_edges' %}selected{% endif %}>Vertical Edges</option>
+                    </select>
+                </div>
+                <!-- This button is now largely for display if JS is off, as onchange submits -->
+                <button type="submit" style="display: none;">Apply Filter</button>
+            </form>
+
+            <form action="/reset" method="post">
+                <button type="submit" class="reset-button">Upload New Image</button>
+            </form>
+
+            <div class="image-display">
+                <div class="image-box">
+                    <h2>Original Image</h2>
+                    <img src="{{ url_for('uploaded_file', filename=original_image) }}" alt="Original Image">
+                </div>
+
+                <div class="image-box">
+                    <h2>Processed Image ({{ selected_filter | replace('_', ' ') | title }})</h2>
+                    <!-- Add cache_buster to prevent browser caching of the same processed_image.png -->
+                    <img src="{{ url_for('processed_file', filename=processed_image) }}?v={{ cache_buster }}" alt="Processed Image">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
