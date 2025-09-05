@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🧠 AI Image Caption Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center; /* Center container horizontally */
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* === Sidebar === */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 250px;
+      background-color: #343a40;
+      color: white;
+      overflow-x: hidden;
+      transform: translateX(-220px);
+      transition: transform 0.3s ease;
+      z-index: 999;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+    }
+
+    .sidebar:hover {
+      transform: translateX(0);
+    }
+
+    .sidebar .tab {
+      position: absolute;
+      right: -30px;
+      top: 120px;
+      background-color: #343a40;
+      width: 30px;
+      height: 120px;
+      color: white;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 1px 0 5px rgba(0,0,0,0.3);
+    }
+
+    .sidebar-content {
+      padding: 20px;
+      margin-top: 60px;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .sidebar button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .sidebar button:hover {
+      background-color: #0056b3;
+    }
+
+    /* === Main content container centered === */
+    .container {
+      margin: 60px auto;
+      padding: 30px;
+      background: white;
+      max-width: 800px;
+      width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #444;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    .caption {
+      background-color: #f0f0f0;
+      padding: 15px;
+      margin-top: 20px;
+      border-left: 5px solid #007BFF;
+      font-size: 18px;
+      white-space: pre-wrap;
+    }
+
+    .style-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .style-buttons form {
+      display: inline-block;
+    }
+
+    .style-button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      user-select: none;
+    }
+
+    .style-button:hover {
+      background-color: #0056b3;
+    }
+
+    select, input[type="file"], button {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Flash messages */
+    ul.flash-messages {
+      list-style: none;
+      padding: 0;
+      margin: 10px auto 30px;
+      max-width: 800px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* === Center the form inside container === */
+    form {
+      margin: 20px auto;
+      max-width: 320px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar: Gemini API Key -->
+  <div class="sidebar">
+    <div class="tab">🔑 Key</div>
+    <div class="sidebar-content">
+      <h2>🔐 Gemini API Key</h2>
+      <form method="POST" action="/set-key">
+        <input type="text" name="api_key" placeholder="Enter your Gemini API key" required autocomplete="off" />
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App UI -->
+  <div class="container">
+    <h1>🖼️ AI Image Caption Generator</h1>
+    <p>Upload an image and generate captions in different styles.</p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if not image_url %}
+      <!-- Image Upload Form -->
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required /><br />
+        <select name="style" aria-label="Select caption style">
+          <option value="shashi">Shashi Tharoor</option>
+          <option value="shakespeare">Shakespeare</option>
+          <option value="casual" selected>Casual</option>
+          <option value="genz">Gen Z</option>
+        </select><br />
+        <button type="submit">Upload & Generate</button>
+      </form>
+    {% else %}
+      <!-- Display Uploaded Image -->
+      <img src="{{ image_url }}" alt="Uploaded Image" />
+
+      <!-- Display Caption -->
+      {% if caption %}
+        <div class="caption">
+          <strong>{{ selected_style|capitalize }} Style:</strong><br />
+          {{ caption }}
+        </div>
+      {% endif %}
+
+      <!-- Style Switcher Buttons -->
+      <div class="style-buttons" role="group" aria-label="Switch caption style">
+        <form method="POST" action="/caption">
+          <input type="hidden" name="style" value="shashi" />
+          <button class="style-button" type="submit">🧐 Shashi Tharoor</button>
+        </form>
+        <form method="POST" action="/caption">
+          <input type="hidden" name="style" value="shakespeare" />
+          <button class="style-button" type="submit">🎭 Shakespeare</button>
+        </form>
+        <form method="POST" action="/caption">
+          <input type="hidden" name="style" value="casual" />
+          <button class="style-button" type="submit">😎 Casual</button>
+        </form>
+        <form method="POST" action="/caption">
+          <input type="hidden" name="style" value="genz" />
+          <button class="style-button" type="submit">🧃 Gen Z</button>
+        </form>
+      </div>
+
+      <hr style="margin: 40px 0;" />
+
+      <!-- New Image Upload -->
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required />
+        <select name="style" aria-label="Select caption style">
+          <option value="shashi">Shashi Tharoor</option>
+          <option value="shakespeare">Shakespeare</option>
+          <option value="casual" selected>Casual</option>
+          <option value="genz">Gen Z</option>
+        </select><br />
+        <button type="submit">Upload New Image</button>
+      </form>
+    {% endif %}
+  </div>
+
+</body>
+</html>
