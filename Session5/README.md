@@ -36,7 +36,7 @@ The model uses a CNN architecture with the following components:
 
 ### Key Features
 - Uses Batch Normalization for better training stability
-- Implements Dropout (0.001) for regularization
+- Implements Dropout for regularization
 - Global Average Pooling instead of Fully Connected layers
 - Less than 20k parameters for efficiency
 
@@ -51,7 +51,7 @@ The model uses a CNN architecture with the following components:
    - Important for training stability
 
 3. **Dropout**
-   - Used dropout(0.1)
+   - Used dropout for regularization.
    - Essential for preventing overfitting
 
 4. **Global Average Pooling**
