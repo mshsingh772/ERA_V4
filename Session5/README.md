@@ -1,7 +1,5 @@
 # MNIST Model
 
-![Model Tests](https://github.com/mshsingh772/era_v4/actions/workflows/model-architecture-tests.yml/badge.svg)
-
 A lightweight CNN model implementation for MNIST digit classification.
 
 ## Model Architecture
@@ -43,23 +41,20 @@ The model uses a CNN architecture with the following components:
 - Less than 20k parameters for efficiency
 
 ## Test Cases
-
-The model architecture is verified through automated tests:
-
-1. **Parameter Count Test**
-   - Ensures model has less than 20,000 parameters. Current implementation has 16,352 parameters.
+![Tests log](assets/tests_log.png) 
+1. **Parameter Count**
+   - Current implementation has 16,352 parameters.
    - Promotes efficient architecture design
 
-2. **Batch Normalization Test**
-   - Verifies presence of BatchNorm layers
+2. **Batch Normalization**
+   - The architecture used includes Batch Normalization.
    - Important for training stability
 
-3. **Dropout Test**
-   - Confirms use of Dropout2d layers
+3. **Dropout**
+   - Used dropout(0.1)
    - Essential for preventing overfitting
 
-4. **Architecture Test**
-   - Checks for either Fully Connected or Global Average Pooling
+4. **Global Average Pooling**
    - Current implementation uses Global Average Pooling
 
 ## Training Logs  
