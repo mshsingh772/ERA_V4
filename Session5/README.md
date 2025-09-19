@@ -1,6 +1,6 @@
 # MNIST Model
 
-![Model Tests](https://github.com/mshsingh772/MNIST-20k/actions/workflows/model_tests.yml/badge.svg)
+![Model Tests](https://github.com/mshsingh772/era_v4/actions/workflows/model-architecture-tests.yml/badge.svg)
 
 A lightweight CNN model implementation for MNIST digit classification.
 
