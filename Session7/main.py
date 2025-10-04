@@ -164,4 +164,10 @@ def main():
 #     plot_loss(train_losses, test_losses)
 
 if __name__ == "__main__":
+    from torchsummary import summary
+    import torch
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = MyNet().to(device)
+    # Print model summary
+    summary(model, input_size=(3, 32, 32)) 
     main()
